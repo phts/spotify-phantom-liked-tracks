@@ -1,10 +1,22 @@
 {
-  "name": "phantom-liked-tracks",
+  "name": "spotify-phantom-liked-tracks",
   "version": "0.0.0",
-  "description": "",
   "private": true,
   "author": "Phil Tsaryk",
-  "license": "ISC",
+  "type": "module",
   "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "node-fetch": "^2.7.0",
+    "spotify-web-api-node": "^5.0.2"
+  },
+  "devDependencies": {
+    "@babel/eslint-parser": "^7.22.15",
+    "@babel/plugin-syntax-import-assertions": "^7.22.5",
+    "@phts/eslint-config": "^2.0.0",
+    "@phts/prettier-config": "^1.2.0",
+    "eslint": "^8.50.0",
+    "prettier": "^2.8.8"
   }
 }

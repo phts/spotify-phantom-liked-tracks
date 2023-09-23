@@ -1,0 +1,19 @@
+{
+  "extends": [
+    "@phts",
+    "@phts/eslint-config/addons/node",
+    "@phts/eslint-config/addons/module",
+    "@phts/eslint-config/addons/prettier"
+  ],
+  "parser": "@babel/eslint-parser",
+  "parserOptions": {
+    "requireConfigFile": false,
+    "babelOptions": {
+      "plugins": ["@babel/plugin-syntax-import-assertions"]
+    }
+  },
+  "overrides": [
+    {"files": "**/*.js", "extends": "@phts/eslint-config/rules/module"},
+    {"files": "*", "extends": "@phts/eslint-config/addons/prettier"}
+  ]
+}
