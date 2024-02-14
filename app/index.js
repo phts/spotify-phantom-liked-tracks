@@ -1,4 +1,5 @@
 import SpotifyWebApi from 'spotify-web-api-node'
+import {WebapiError} from 'spotify-web-api-node/src/response-error.js'
 import {analyze} from './analyze.js'
 
 function createAuthorizeURL(api) {
@@ -6,32 +7,45 @@ function createAuthorizeURL(api) {
   return api.createAuthorizeURL(scopes)
 }
 
-export async function app(settings, storeAuth) {
+async function askToAuthorize(api, {saveCode}) {
+  console.info('Open the link below and copy/paste the URL from address bar in the browser back to the terminal')
+  console.info(createAuthorizeURL(api))
+
+  const url = await new Promise(async (resolve) => {
+    const readline = (await import('node:readline')).createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    })
+    readline.question(`URL:`, (url) => {
+      readline.close()
+      resolve(url)
+    })
+  })
+  const codeUrl = new URL(url)
+  const code = codeUrl.searchParams.get('code')
+  if (!code) {
+    throw new Error('Provided URL does not contain authorization code')
+  }
+  saveCode(code)
+  console.info('Authorization code is saved')
+}
+
+async function initApi(settings, {saveAuth, saveCode}) {
   const api = new SpotifyWebApi({
     clientId: settings.clientId,
     clientSecret: settings.clientSecret,
-    redirectUri: settings.redirectUri,
+    redirectUri: 'http://localhost',
   })
-
   if (settings.code) {
-    try {
-      const data = await api.authorizationCodeGrant(settings.code)
-      const accessToken = data.body.access_token
-      const refreshToken = data.body.refresh_token
-      console.info('The token expires in ' + data.body.expires_in)
-      console.info('The access token is ' + accessToken)
-      console.info('The refresh token is ' + refreshToken)
-      settings.accessToken = accessToken
-      settings.refreshToken = refreshToken
-      storeAuth({accessToken, refreshToken})
-    } catch (e) {
-      if (e.statusCode === 400) {
-        console.error('Authorization code expired')
-        console.info(createAuthorizeURL(api))
-        return
-      }
-      throw e
-    }
+    const data = await api.authorizationCodeGrant(settings.code)
+    const accessToken = data.body.access_token
+    const refreshToken = data.body.refresh_token
+    console.info('The token expires in ' + data.body.expires_in)
+    console.info('The access token is ' + accessToken)
+    console.info('The refresh token is ' + refreshToken)
+    settings.accessToken = accessToken
+    settings.refreshToken = refreshToken
+    saveAuth({accessToken, refreshToken})
   }
 
   if (settings.accessToken && settings.refreshToken) {
@@ -40,12 +54,31 @@ export async function app(settings, storeAuth) {
   }
 
   try {
+    // check if authorized
+    await api.containsMySavedTracks(['7ouMYWpwJ422jRcDASZB7P'])
+    return api
+  } catch (e) {
+    if (e.statusCode === 400 || e.statusCode === 401) {
+      console.info('Authorization is required')
+      await askToAuthorize(api, {saveCode})
+      console.info('Restart the application')
+      process.exit(0)
+    }
+    throw e
+  }
+}
+
+export async function app(settings, callbacks) {
+  const api = await initApi(settings, callbacks)
+
+  try {
     await analyze(api)
   } catch (e) {
-    if (e.statusCode === 401) {
-      console.error('Not authorized')
-      console.info(createAuthorizeURL(api))
-      return
+    if (e instanceof WebapiError) {
+      console.error(e.message.toString())
+      console.error(e.body)
+      console.error(e.headers)
+      console.error(e.statusCode)
     }
     throw e
   }

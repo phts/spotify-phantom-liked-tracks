@@ -1,11 +1,12 @@
-import {writeFileSync} from 'fs'
+import {writeFileSync, unlinkSync} from 'fs'
 import path from 'path'
 import {fileURLToPath} from 'url'
 import {app} from './app/index.js'
 import settings from './settings.json' assert {type: 'json'}
 
 const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+const CODE_JSON_PATH = path.resolve(path.dirname(__filename), 'code.json')
+const AUTH_JSON_PATH = path.resolve(path.dirname(__filename), 'auth.json')
 
 try {
   const {
@@ -13,24 +14,27 @@ try {
   } = await import('./code.json', {assert: {type: 'json'}})
   settings.code = code
 } catch (e) {
-  console.warn(`No code.json: ${e}`)
+  // ignore
 }
 
 try {
   const {
     default: {accessToken, refreshToken},
   } = await import('./auth.json', {assert: {type: 'json'}})
-  settings.code = null
   settings.accessToken = accessToken
   settings.refreshToken = refreshToken
 } catch (e) {
-  console.warn(`No auth.json: ${e}`)
+  // ignore
 }
 
-function storeAuth(data) {
-  writeFileSync(path.resolve(__dirname, 'auth.json'), JSON.stringify(data, null, 2))
+function saveCode(code) {
+  writeFileSync(CODE_JSON_PATH, JSON.stringify({code}, null, 2))
+}
+function saveAuth(data) {
+  writeFileSync(AUTH_JSON_PATH, JSON.stringify(data, null, 2))
+  unlinkSync(CODE_JSON_PATH)
 }
 
-app(settings, storeAuth).catch((e) => {
+app(settings, {saveAuth, saveCode}).catch((e) => {
   console.error(e)
 })
