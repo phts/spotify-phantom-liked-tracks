@@ -8,6 +8,9 @@
     "start": "node --no-warnings=ExperimentalWarning index.js",
     "start:log": "node --no-warnings=ExperimentalWarning index.js > out.log 2>&1"
   },
+  "engines": {
+    "node": ">=16"
+  },
   "dependencies": {
     "node-fetch": "^2.7.0",
     "spotify-web-api-node": "^5.0.2"
