@@ -5,7 +5,8 @@
   "author": "Phil Tsaryk",
   "type": "module",
   "scripts": {
-    "start": "node index.js"
+    "start": "node --no-warnings=ExperimentalWarning index.js",
+    "start:log": "node --no-warnings=ExperimentalWarning index.js > out.log 2>&1"
   },
   "dependencies": {
     "node-fetch": "^2.7.0",
