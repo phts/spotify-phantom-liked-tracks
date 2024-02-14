@@ -1,13 +1,20 @@
 import {cached} from './cached.js'
+import {fetchPagedData} from './fetchPagedData.js'
 
 async function analyzeAlbums(api) {
   console.info('Analyzing albums...')
-  const {
-    body: {total, items: albums},
-  } = await api.getMySavedAlbums({limit: 50})
-  if (total > 50) {
-    console.warn('You have more than 50 albums')
-  }
+  const albums = []
+  await fetchPagedData(
+    api,
+    'getMySavedAlbums',
+    {},
+    {
+      onData: (items) => {
+        albums.push(...items)
+      },
+    }
+  )
+
   const albumsGroupedByArtists = albums.reduce((acc, {album}) => {
     if (album.artists.length > 1) {
       console.warn(`Multiple artists: ${album.artists.map((x) => x.name).join(', ')} for album "${album.name}"`)
@@ -21,12 +28,21 @@ async function analyzeAlbums(api) {
 
   for (const [artistId, favAlbums] of Object.entries(albumsGroupedByArtists)) {
     const artist = favAlbums[0].artists[0]
-    const {
-      body: {total, items: artistAlbums},
-    } = await cached(() => api.getArtistAlbums(artistId, {limit: 50}), `artist/${artistId}`)
-    if (total > 50) {
-      console.warn(`${artist.name} has more than 50 albums`)
-    }
+    const artistAlbums = await cached(async () => {
+      const artistAlbums = []
+      await fetchPagedData(
+        api,
+        'getArtistAlbums',
+        {requiredArgs: [artistId]},
+        {
+          onData: (items) => {
+            artistAlbums.push(...items)
+          },
+        }
+      )
+      return artistAlbums
+    }, `artist/${artistId}`)
+
     favAlbums.forEach((fa) => {
       console.info(`> ${artist.name} - ${fa.name}`)
       const exists = artistAlbums.some((aa) => aa.id === fa.id)
@@ -41,12 +57,17 @@ async function analyzeAlbums(api) {
 
 async function analyzeTracks(api) {
   console.info('Analyzing tracks...')
-  const {
-    body: {total, items: tracks},
-  } = await api.getMySavedTracks({limit: 50})
-  if (total > 50) {
-    console.warn('You have more than 50 albums')
-  }
+  const tracks = []
+  await fetchPagedData(
+    api,
+    'getMySavedTracks',
+    {},
+    {
+      onData: (items) => {
+        tracks.push(...items)
+      },
+    }
+  )
 
   const tracksGroupedByArtistsAndAlbums = tracks.reduce((acc, {track}) => {
     if (track.artists.length > 1) {
@@ -61,12 +82,20 @@ async function analyzeTracks(api) {
   }, {})
 
   for (const [artistId, artistTracks] of Object.entries(tracksGroupedByArtistsAndAlbums)) {
-    const {
-      body: {total, items: artistRealAlbums},
-    } = await cached(() => api.getArtistAlbums(artistId, {limit: 50}), `artist/${artistId}`)
-    if (total > 50) {
-      console.warn(`https://open.spotify.com/artist/${artistId} has more than 50 albums`)
-    }
+    const artistRealAlbums = await cached(async () => {
+      const artistAlbums = []
+      await fetchPagedData(
+        api,
+        'getArtistAlbums',
+        {requiredArgs: [artistId]},
+        {
+          onData: (items) => {
+            artistAlbums.push(...items)
+          },
+        }
+      )
+      return artistAlbums
+    }, `artist/${artistId}`)
 
     for (const favTrack of artistTracks) {
       console.info(`> ${favTrack.artists[0].name} - ${favTrack.name}`)

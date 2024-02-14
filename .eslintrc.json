@@ -12,6 +12,9 @@
       "plugins": ["@babel/plugin-syntax-import-assertions"]
     }
   },
+  "rules": {
+    "no-async-promise-executor": "off"
+  },
   "overrides": [
     {"files": "**/*.js", "extends": "@phts/eslint-config/rules/module"},
     {"files": "*", "extends": "@phts/eslint-config/addons/prettier"}
