@@ -1,6 +1,28 @@
 import {cached} from './cached.js'
 import {fetchPagedData} from './fetchPagedData.js'
 
+function trackLink(id) {
+  return `https://open.spotify.com/track/${id}`
+}
+function albumLink(id) {
+  return `https://open.spotify.com/album/${id}`
+}
+function artistLink(id) {
+  return `https://open.spotify.com/artist/${id}`
+}
+
+function logSimilarAlbums(albums, name) {
+  const similar = albums.filter(
+    (al) => al.name.toLowerCase().includes(name.toLowerCase()) || name.toLowerCase().includes(al.name.toLowerCase())
+  )
+  if (similar.length) {
+    console.warn(
+      '!',
+      `Possibly suppressed by:\n${similar.map((c) => `   "${c.name}" [${albumLink(c.id)}]`).join('\n')}`
+    )
+  }
+}
+
 async function analyzeAlbums(api) {
   console.info('Analyzing albums...')
   const albums = []
@@ -17,7 +39,7 @@ async function analyzeAlbums(api) {
 
   const albumsGroupedByArtists = albums.reduce((acc, {album}) => {
     if (album.artists.length > 1) {
-      console.warn(`Multiple artists: ${album.artists.map((x) => x.name).join(', ')} for album "${album.name}"`)
+      console.warn('?', `Multiple artists: ${album.artists.map((x) => x.name).join(', ')} for album "${album.name}"`)
     }
     const artistId = album.artists[0].id
     const artistAlbums = acc[artistId] || []
@@ -44,12 +66,14 @@ async function analyzeAlbums(api) {
     }, `artist/${artistId}`)
 
     favAlbums.forEach((fa) => {
-      console.info(`> ${artist.name} - ${fa.name}`)
+      console.info(`> [${albumLink(fa.id)}] ${artist.name} - ${fa.name}`)
       const exists = artistAlbums.some((aa) => aa.id === fa.id)
       if (!exists) {
         console.warn(
-          `"${fa.name}" [https://open.spotify.com/album/${fa.id}] does not exist in artist [https://open.spotify.com/artist/${artistId}]`
+          '!',
+          `Album "${fa.name}" [${albumLink(fa.id)}] does not exist in the artist [${artistLink(artistId)}]`
         )
+        logSimilarAlbums(artistAlbums, fa.name)
       }
     })
   }
@@ -71,7 +95,10 @@ async function analyzeTracks(api) {
 
   const tracksGroupedByArtistsAndAlbums = tracks.reduce((acc, {track}) => {
     if (track.artists.length > 1) {
-      console.warn(`Multiple artists: ${track.artists.map((x) => x.name).join(', ')} for track "${track.name}"`)
+      console.warn(
+        '?',
+        `Multiple artists: ${track.artists.map((x) => x.name).join(', ')} for the track "${track.name}"`
+      )
     }
     const artistId = track.artists[0].id
     const artistTracks = acc[artistId] || []
@@ -98,13 +125,16 @@ async function analyzeTracks(api) {
     }, `artist/${artistId}`)
 
     for (const favTrack of artistTracks) {
-      console.info(`> ${favTrack.artists[0].name} - ${favTrack.name}`)
-      const favTrackAlbum = favTrack.album
-      const realTrackAlbum = artistRealAlbums.find((al) => al.name === favTrackAlbum.name)
+      console.info(`> [${trackLink(favTrack.id)}] ${favTrack.artists[0].name} - ${favTrack.name}`)
+      const realTrackAlbum = artistRealAlbums.find((al) => al.id === favTrack.album.id)
       if (!realTrackAlbum) {
         console.warn(
-          `Real album of track "${favTrack.name}" from album [https://open.spotify.com/album/${favTrack.album}] from artist [https://open.spotify.com/artist/${artistId}]`
+          '!',
+          `Track "${favTrack.name}" belongs to the album [${albumLink(
+            favTrack.album.id
+          )}] which does not exist in the artist [${artistLink(artistId)}]`
         )
+        logSimilarAlbums(artistRealAlbums, favTrack.album.name)
         continue
       }
 
@@ -115,7 +145,10 @@ async function analyzeTracks(api) {
       const realTrack = realAlbumTracks.find((tr) => tr.id === favTrack.id)
       if (!realTrack) {
         console.warn(
-          `"${favTrack.name}" from album [https://open.spotify.com/album/${favTrack.album.id}] does not exist in artist [https://open.spotify.com/artist/${artistId}]`
+          '!',
+          `Track "${favTrack.name}" from the album [${albumLink(
+            favTrack.album.id
+          )}] does not exist in the artist [${artistLink(artistId)}]`
         )
         continue
       }
