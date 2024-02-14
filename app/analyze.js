@@ -1,6 +1,8 @@
 import {cached} from './cached.js'
 import {fetchPagedData} from './fetchPagedData.js'
 
+const COOLDOWN_PERIOD = 200
+
 function trackLink(id) {
   return `https://open.spotify.com/track/${id}`
 }
@@ -9,6 +11,12 @@ function albumLink(id) {
 }
 function artistLink(id) {
   return `https://open.spotify.com/artist/${id}`
+}
+
+function wait(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
 }
 
 function logSimilarAlbums(albums, name) {
@@ -51,6 +59,7 @@ async function analyzeAlbums(api) {
   for (const [artistId, favAlbums] of Object.entries(albumsGroupedByArtists)) {
     const artist = favAlbums[0].artists[0]
     const artistAlbums = await cached(async () => {
+      await wait(COOLDOWN_PERIOD)
       const artistAlbums = []
       await fetchPagedData(
         api,
@@ -111,6 +120,7 @@ async function analyzeTracks(api) {
   for (const [artistId, artistTracks] of Object.entries(tracksGroupedByArtistsAndAlbums)) {
     const artistRealAlbums = await cached(async () => {
       const artistAlbums = []
+      await wait(COOLDOWN_PERIOD)
       await fetchPagedData(
         api,
         'getArtistAlbums',
@@ -138,6 +148,7 @@ async function analyzeTracks(api) {
         continue
       }
 
+      await wait(COOLDOWN_PERIOD)
       const {
         body: {items: realAlbumTracks},
       } = await api.getAlbumTracks(realTrackAlbum.id, {limit: 50})

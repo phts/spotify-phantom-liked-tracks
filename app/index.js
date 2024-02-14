@@ -74,6 +74,10 @@ export async function app(settings, callbacks) {
   try {
     await analyze(api)
   } catch (e) {
+    if (e.statusCode === 429) {
+      console.error('Spotify API method failed due to "Too many requests". Try again later.')
+      return
+    }
     if (e instanceof WebapiError) {
       console.error(e.message.toString())
       console.error(e.body)
