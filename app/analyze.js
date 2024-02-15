@@ -75,7 +75,6 @@ async function analyzeAlbums(api) {
     }, `artist/${artistId}`)
 
     favAlbums.forEach((fa) => {
-      console.info(`> [${albumLink(fa.id)}] ${artist.name} - ${fa.name}`)
       const exists = artistAlbums.some((aa) => aa.id === fa.id)
       if (!exists) {
         console.warn(
@@ -84,6 +83,7 @@ async function analyzeAlbums(api) {
         )
         logSimilarAlbums(artistAlbums, fa.name)
       }
+      console.info('✓', `[${albumLink(fa.id)}] ${artist.name} - ${fa.name}`)
     })
   }
 }
@@ -135,12 +135,11 @@ async function analyzeTracks(api) {
     }, `artist/${artistId}`)
 
     for (const favTrack of artistTracks) {
-      console.info(`> [${trackLink(favTrack.id)}] ${favTrack.artists[0].name} - ${favTrack.name}`)
       const realTrackAlbum = artistRealAlbums.find((al) => al.id === favTrack.album.id)
       if (!realTrackAlbum) {
         console.warn(
           '!',
-          `Track "${favTrack.name}" belongs to the album [${albumLink(
+          `Track "${favTrack.name}" [${trackLink(favTrack.id)}] belongs to the album [${albumLink(
             favTrack.album.id
           )}] which does not exist in the artist [${artistLink(artistId)}]`
         )
@@ -157,12 +156,14 @@ async function analyzeTracks(api) {
       if (!realTrack) {
         console.warn(
           '!',
-          `Track "${favTrack.name}" from the album [${albumLink(
+          `Track "${favTrack.name}" [${trackLink(favTrack.id)}] from the album [${albumLink(
             favTrack.album.id
           )}] does not exist in the artist [${artistLink(artistId)}]`
         )
         continue
       }
+
+      console.info('✓', `[${trackLink(favTrack.id)}] ${favTrack.artists[0].name} - ${favTrack.name}`)
     }
   }
 }
