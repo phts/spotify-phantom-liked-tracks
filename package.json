@@ -12,6 +12,7 @@
     "node": ">=16"
   },
   "dependencies": {
+    "chalk": "^5.3.0",
     "node-fetch": "^2.7.0",
     "spotify-web-api-node": "^5.0.2"
   },
