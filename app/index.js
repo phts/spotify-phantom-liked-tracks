@@ -16,7 +16,7 @@ async function askToAuthorize(api, {saveCode}) {
       input: process.stdin,
       output: process.stdout,
     })
-    readline.question(`URL:`, (url) => {
+    readline.question(`Paste the URL here:`, (url) => {
       readline.close()
       resolve(url)
     })
@@ -40,9 +40,6 @@ async function initApi(settings, {saveAuth, saveCode}) {
     const data = await api.authorizationCodeGrant(settings.code)
     const accessToken = data.body.access_token
     const refreshToken = data.body.refresh_token
-    console.info('The token expires in ' + data.body.expires_in)
-    console.info('The access token is ' + accessToken)
-    console.info('The refresh token is ' + refreshToken)
     settings.accessToken = accessToken
     settings.refreshToken = refreshToken
     saveAuth({accessToken, refreshToken})
