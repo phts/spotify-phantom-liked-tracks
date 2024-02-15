@@ -88,6 +88,7 @@ async function analyzeAlbums(api) {
           `Album "${fa.name}" [${albumLink(fa.id)}] does not exist in the artist [${artistLink(artistId)}]`
         )
         logSimilarAlbums(artistAlbums, fa.name)
+        return
       }
       console.info(chalk.green('✓'), `[${albumLink(fa.id)}] ${artist.name} - ${fa.name}`)
     })
