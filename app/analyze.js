@@ -47,12 +47,6 @@ async function analyzeAlbums(api) {
   )
 
   const albumsGroupedByArtists = albums.reduce((acc, {album}) => {
-    if (album.artists.length > 1) {
-      console.warn(
-        chalk.blue('?'),
-        `Multiple artists: ${album.artists.map((x) => x.name).join(', ')} for album "${album.name}"`
-      )
-    }
     const artistId = album.artists[0].id
     const artistAlbums = acc[artistId] || []
     artistAlbums.push(album)
@@ -79,6 +73,14 @@ async function analyzeAlbums(api) {
     }, `artist/${artistId}`)
 
     favAlbums.forEach((fa) => {
+      if (fa.artists.length > 1) {
+        console.warn(
+          chalk.blue('?'),
+          `Album "${fa.name}" has multiple artists: ${fa.artists
+            .map((x) => x.name)
+            .join(', ')}. Processing only the first one...`
+        )
+      }
       const exists = artistAlbums.some((aa) => aa.id === fa.id)
       if (!exists) {
         console.warn(
@@ -107,12 +109,6 @@ async function analyzeTracks(api) {
   )
 
   const tracksGroupedByArtistsAndAlbums = tracks.reduce((acc, {track}) => {
-    if (track.artists.length > 1) {
-      console.warn(
-        chalk.blue('?'),
-        `Multiple artists: ${track.artists.map((x) => x.name).join(', ')} for the track "${track.name}"`
-      )
-    }
     const artistId = track.artists[0].id
     const artistTracks = acc[artistId] || []
     artistTracks.push(track)
@@ -139,6 +135,15 @@ async function analyzeTracks(api) {
     }, `artist/${artistId}`)
 
     for (const favTrack of artistTracks) {
+      if (favTrack.artists.length > 1) {
+        console.warn(
+          chalk.blue('?'),
+          `Track "${favTrack.name}" has multiple artists: ${favTrack.artists
+            .map((x) => x.name)
+            .join(', ')}. Processing only the first one...`
+        )
+      }
+
       const realTrackAlbum = artistRealAlbums.find((al) => al.id === favTrack.album.id)
       if (!realTrackAlbum) {
         console.warn(
