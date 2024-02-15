@@ -4,6 +4,8 @@ import {fetchPagedData} from './fetchPagedData.js'
 
 const COOLDOWN_PERIOD = 200
 
+const VARIOUS_ARTISTS_ID = '0LyfQWJT6nXafLPZqxe9Of'
+
 function trackLink(id) {
   return `https://open.spotify.com/track/${id}`
 }
@@ -56,6 +58,13 @@ async function analyzeAlbums(api) {
 
   for (const [artistId, favAlbums] of Object.entries(albumsGroupedByArtists)) {
     const artist = favAlbums[0].artists[0]
+    if (artistId === VARIOUS_ARTISTS_ID) {
+      favAlbums.forEach((fa) => {
+        console.warn(chalk.blue('?'), `Album "${fa.name}" has "${artist.name}" as artist. Skipping...`)
+        console.info(chalk.green('✓'), `[${albumLink(fa.id)}] ${artist.name} - ${fa.name}`)
+      })
+      return
+    }
     const artistAlbums = await cached(async () => {
       await wait(COOLDOWN_PERIOD)
       const artistAlbums = []
