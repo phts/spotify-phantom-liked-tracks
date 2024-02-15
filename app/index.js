@@ -8,7 +8,9 @@ function createAuthorizeURL(api) {
 }
 
 async function askToAuthorize(api, {saveCode}) {
-  console.info('Open the link below and copy/paste the URL from address bar in the browser back to the terminal')
+  console.info(
+    'Open the link below, authorize the app and copy/paste the URL from address bar in the browser back to the terminal'
+  )
   console.info(createAuthorizeURL(api))
 
   const url = await new Promise(async (resolve) => {
@@ -16,7 +18,7 @@ async function askToAuthorize(api, {saveCode}) {
       input: process.stdin,
       output: process.stdout,
     })
-    readline.question(`Paste the URL here:`, (url) => {
+    readline.question(`Paste the new URL here:`, (url) => {
       readline.close()
       resolve(url)
     })
