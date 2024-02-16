@@ -28,7 +28,7 @@ function logSimilarAlbums(albums, name) {
   )
   if (similar.length) {
     console.warn(
-      chalk.yellow('!'),
+      ' ',
       `Possibly suppressed by:\n${similar.map((c) => `   "${c.name}" [${albumLink(c.id)}]`).join('\n')}`
     )
   }
