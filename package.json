@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node --no-warnings=ExperimentalWarning index.js",
-    "start:log": "node --no-warnings=ExperimentalWarning index.js > out.log 2>&1"
+    "start:log": "node --no-warnings=ExperimentalWarning index.js > $(date --iso-8601=seconds).log 2>&1"
   },
   "engines": {
     "node": ">=16"
