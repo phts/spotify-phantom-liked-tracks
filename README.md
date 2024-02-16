@@ -18,3 +18,21 @@ This app will find such suspicious duplicates to allow you fixing them manually.
    ```sh
    npm start
    ```
+
+## How it works
+
+### Albums
+
+1. For each favorite album:
+
+  1. Retrieves album's artist
+  2. Gets all albums of this artist, i.e. albums which shown in Spotify UI
+  3. If the favorite album entry is not included into the list above, then it means it was suppressed by other entry, e.g. remaster, but still is marked as favorite.
+
+     The app will try to find similar albums which could replace the old one.
+
+### Tracks
+
+1. For each favorite track:
+
+  1.
