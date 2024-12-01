@@ -1,26 +1,24 @@
-import {writeFileSync, unlinkSync} from 'fs'
-import path from 'path'
-import {fileURLToPath} from 'url'
+import {readFileSync, writeFileSync, unlinkSync} from 'node:fs'
+import path from 'node:path'
+import {fileURLToPath} from 'node:url'
 import {app} from './app/index.js'
-import settings from './settings.json' assert {type: 'json'}
 
 const __filename = fileURLToPath(import.meta.url)
-const CODE_JSON_PATH = path.resolve(path.dirname(__filename), 'code.json')
-const AUTH_JSON_PATH = path.resolve(path.dirname(__filename), 'auth.json')
+const __dirname = path.dirname(__filename)
+const CODE_JSON_PATH = path.resolve(__dirname, 'code.json')
+const AUTH_JSON_PATH = path.resolve(__dirname, 'auth.json')
+const settingsPath = path.resolve(__dirname, 'settings.json')
+const settings = JSON.parse(readFileSync(settingsPath, 'utf8'))
 
 try {
-  const {
-    default: {code},
-  } = await import('./code.json', {assert: {type: 'json'}})
+  const {code} = JSON.parse(readFileSync(CODE_JSON_PATH, 'utf8'))
   settings.code = code
 } catch (e) {
   // ignore
 }
 
 try {
-  const {
-    default: {accessToken, refreshToken},
-  } = await import('./auth.json', {assert: {type: 'json'}})
+  const {accessToken, refreshToken} = JSON.parse(readFileSync(AUTH_JSON_PATH, 'utf8'))
   settings.accessToken = accessToken
   settings.refreshToken = refreshToken
 } catch (e) {

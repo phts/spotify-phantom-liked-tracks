@@ -5,11 +5,11 @@
   "author": "Phil Tsaryk",
   "type": "module",
   "scripts": {
-    "start": "node --no-warnings=ExperimentalWarning index.js",
-    "start:log": "node --no-warnings=ExperimentalWarning index.js > $(date --iso-8601=seconds).log 2>&1"
+    "start": "node index.js",
+    "start:log": "node index.js > $(date --iso-8601=seconds).log 2>&1"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=22"
   },
   "dependencies": {
     "chalk": "^5.3.0",

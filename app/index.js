@@ -18,7 +18,7 @@ async function askToAuthorize(api, {saveCode}) {
       input: process.stdin,
       output: process.stdout,
     })
-    readline.question(`Paste the new URL here:`, (url) => {
+    readline.question('Paste the new URL here: ', (url) => {
       readline.close()
       resolve(url)
     })
