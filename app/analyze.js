@@ -93,7 +93,7 @@ async function analyzeAlbums(api) {
       const exists = artistAlbums.some((aa) => aa.id === fa.id)
       if (!exists) {
         console.warn(
-          chalk.yellow('!'),
+          chalk.bgRed('!'),
           `Album "${fa.name}" [${albumLink(fa.id)}] does not exist in the artist [${artistLink(artistId)}]`
         )
         logSimilarAlbums(artistAlbums, fa.name)
@@ -157,7 +157,7 @@ async function analyzeTracks(api) {
       const realTrackAlbum = artistRealAlbums.find((al) => al.id === favTrack.album.id)
       if (!realTrackAlbum) {
         console.warn(
-          chalk.yellow('!'),
+          chalk.bgRed('!'),
           `Track "${favTrack.name}" [${trackLink(favTrack.id)}] belongs to the album [${albumLink(
             favTrack.album.id
           )}] which does not exist in the artist [${artistLink(artistId)}]`
@@ -174,7 +174,7 @@ async function analyzeTracks(api) {
       const realTrack = realAlbumTracks.find((tr) => tr.id === favTrack.id)
       if (!realTrack) {
         console.warn(
-          chalk.yellow('!'),
+          chalk.bgRed('!'),
           `Track "${favTrack.name}" [${trackLink(favTrack.id)}] from the album [${albumLink(
             favTrack.album.id
           )}] does not exist in the artist [${artistLink(artistId)}]`

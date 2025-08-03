@@ -16,7 +16,7 @@ This app will find such suspicious duplicates to allow you fixing them manually.
 4. Run for first time:
 
    ```sh
-   npm start # to print all into terminal
+   npm start
    ```
 
    It will ask for authentication. Follow the instructions.
@@ -24,7 +24,7 @@ This app will find such suspicious duplicates to allow you fixing them manually.
 5. Run again:
 
    ```sh
-   npm start
+   npm start # to print all into terminal
    ```
 
    or
