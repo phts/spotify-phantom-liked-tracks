@@ -11,6 +11,9 @@ This app will find such suspicious duplicates to allow you fixing them manually.
 ## Usage
 
 1. [Create a new app](https://developer.spotify.com/documentation/web-api/concepts/apps) in Spotify for Developers
+
+   - Redirect URI: `http://127.0.0.1:9876`
+
 2. Clone the repo and run `npm install`
 3. Create [`settings.json`](./settings.json.example) file with `Client ID` and `Client secret` from the created app above
 4. Run for first time:

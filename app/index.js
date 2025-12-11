@@ -36,7 +36,7 @@ async function initApi(settings, {saveAuth, saveCode}) {
   const api = new SpotifyWebApi({
     clientId: settings.clientId,
     clientSecret: settings.clientSecret,
-    redirectUri: 'http://localhost',
+    redirectUri: 'http://127.0.0.1:9876',
   })
   if (settings.code) {
     const data = await api.authorizationCodeGrant(settings.code)
