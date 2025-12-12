@@ -5,15 +5,18 @@
   "author": "Phil Tsaryk",
   "type": "module",
   "scripts": {
-    "start": "node index.js",
-    "start:log": "node index.js > $(date --iso-8601=seconds).log 2>&1"
+    "format": "prettier -w '*.{md,json}' && npm run lint -- --fix",
+    "lint": "eslint .",
+    "start": "node app/index.js"
   },
   "engines": {
     "node": ">=22"
   },
   "dependencies": {
     "chalk": "^5.6.2",
+    "express": "^5.2.1",
     "node-fetch": "^2.7.0",
+    "open": "^11.0.0",
     "spotify-web-api-node": "^5.0.2"
   },
   "devDependencies": {
@@ -22,6 +25,7 @@
     "@phts/eslint-config": "^2.1.1",
     "@phts/prettier-config": "^1.2.0",
     "eslint": "^8.57.1",
+    "eslint-plugin-prettier": "^5.5.4",
     "prettier": "^3.7.4"
   }
 }

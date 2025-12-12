@@ -1,4 +1,8 @@
-const cache = {}
+let cache = {}
+
+export function clearCache() {
+  cache = {}
+}
 
 export async function cached(func, key) {
   if (cache[key]) {

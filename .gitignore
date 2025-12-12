@@ -1,8 +1,7 @@
 .vscode/
 node_modules/
 
-settings.json
-code.json
-auth.json
+app/settings.json
+app/reports/**/*.json
 
 *.log
